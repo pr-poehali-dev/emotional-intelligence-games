@@ -167,7 +167,7 @@ const Index = () => {
     toast.loading('Создаю PDF презентацию...', { id: 'pdf-export' });
 
     try {
-      const pdf = new jsPDF('landscape', 'mm', 'a4');
+      const pdf = new jsPDF('landscape', 'mm', [297, 210]);
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
 
@@ -230,10 +230,10 @@ const Index = () => {
         </div>
       )}
 
-      <div className="container mx-auto px-4 py-8 relative z-10">
-        <div className="max-w-5xl mx-auto slide-content">
+      <div className="container mx-auto px-4 py-8 relative z-10 flex items-center justify-center min-h-screen">
+        <div className="w-full max-w-4xl aspect-[4/3] slide-content flex items-center justify-center">
           {currentSlide === 0 && (
-            <div className="min-h-[80vh] flex flex-col items-center justify-center text-center animate-fade-in">
+            <div className="w-full h-full flex flex-col items-center justify-center text-center animate-fade-in p-8">
               <div className="mb-8 text-8xl animate-bounce-subtle">🎮</div>
               <h1 className="text-6xl md:text-7xl font-bold mb-6 text-primary">
                 Игры для развития<br />эмоционального интеллекта
@@ -253,7 +253,7 @@ const Index = () => {
           )}
 
           {currentSlide === 1 && (
-            <div className="min-h-[80vh] flex flex-col justify-center animate-fade-in">
+            <div className="w-full h-full flex flex-col justify-center animate-fade-in p-4">
               <Card className="p-12 bg-white/90 backdrop-blur shadow-2xl">
                 <div className="flex items-center gap-4 mb-8">
                   <div className="text-6xl">🧠</div>
@@ -299,7 +299,7 @@ const Index = () => {
           )}
 
           {currentSlide > 1 && currentSlide < totalSlides && (
-            <div className="min-h-[80vh] flex flex-col justify-center animate-fade-in">
+            <div className="w-full h-full flex flex-col justify-center animate-fade-in p-4">
               {games[currentSlide - 2] && (
                 <Card className="p-10 bg-white/90 backdrop-blur shadow-2xl">
                   <div className="flex items-center gap-6 mb-8">
