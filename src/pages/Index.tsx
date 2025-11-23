@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import { toast } from 'sonner';
 
 interface Game {
   id: number;
@@ -139,7 +142,9 @@ const games: Game[] = [
 
 const Index = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isExporting, setIsExporting] = useState(false);
   const totalSlides = games.length + 2;
+  const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const nextSlide = () => {
     if (currentSlide < totalSlides - 1) {
@@ -157,6 +162,51 @@ const Index = () => {
     setCurrentSlide(index);
   };
 
+  const exportToPDF = async () => {
+    setIsExporting(true);
+    toast.loading('Создаю PDF презентацию...', { id: 'pdf-export' });
+
+    try {
+      const pdf = new jsPDF('landscape', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      for (let i = 0; i < totalSlides; i++) {
+        setCurrentSlide(i);
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        const slideElement = document.querySelector('.slide-content');
+        if (slideElement) {
+          const canvas = await html2canvas(slideElement as HTMLElement, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#fff',
+          });
+
+          const imgData = canvas.toDataURL('image/png');
+          const imgWidth = pageWidth;
+          const imgHeight = (canvas.height * pageWidth) / canvas.width;
+
+          if (i > 0) {
+            pdf.addPage();
+          }
+
+          const yOffset = (pageHeight - imgHeight) / 2;
+          pdf.addImage(imgData, 'PNG', 0, yOffset, imgWidth, imgHeight);
+        }
+      }
+
+      pdf.save('Игры-для-развития-эмоционального-интеллекта.pdf');
+      toast.success('PDF успешно создан!', { id: 'pdf-export' });
+      setCurrentSlide(0);
+    } catch (error) {
+      console.error('Ошибка при создании PDF:', error);
+      toast.error('Ошибка при создании PDF', { id: 'pdf-export' });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-100 via-yellow-50 to-blue-100 relative overflow-hidden">
       <div className="absolute inset-0 opacity-10">
@@ -167,8 +217,21 @@ const Index = () => {
         <div className="absolute top-1/2 left-1/2 text-6xl animate-float" style={{ animationDelay: '2s' }}>✨</div>
       </div>
 
+      {!isExporting && (
+        <div className="fixed top-4 right-4 z-30">
+          <Button
+            onClick={exportToPDF}
+            size="lg"
+            className="shadow-lg hover:shadow-xl transition-all"
+          >
+            <Icon name="Download" className="mr-2" />
+            Скачать PDF
+          </Button>
+        </div>
+      )}
+
       <div className="container mx-auto px-4 py-8 relative z-10">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-5xl mx-auto slide-content">
           {currentSlide === 0 && (
             <div className="min-h-[80vh] flex flex-col items-center justify-center text-center animate-fade-in">
               <div className="mb-8 text-8xl animate-bounce-subtle">🎮</div>
