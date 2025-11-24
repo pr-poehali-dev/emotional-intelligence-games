@@ -231,7 +231,7 @@ const Index = () => {
       )}
 
       <div className="container mx-auto px-4 py-8 relative z-10 flex items-center justify-center min-h-screen">
-        <div className="w-full max-w-4xl aspect-[4/3] slide-content flex items-center justify-center">
+        <div className="w-full max-w-6xl aspect-[16/9] slide-content flex items-center justify-center">
           {currentSlide === 0 && (
             <div className="w-full h-full flex flex-col items-center justify-center text-center animate-fade-in p-8">
               <div className="mb-8 text-8xl animate-bounce-subtle">🎮</div>
